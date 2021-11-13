@@ -47,7 +47,7 @@ public class ActorMouseOverride : MonoBehaviour
 
             SpawnClickMarker(navMeshHit.position);
         }
-        else
+        else /* target.point not reachable */
         {
             SpawnClickMarker(target.point);
         }

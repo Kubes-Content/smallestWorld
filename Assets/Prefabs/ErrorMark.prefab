@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 565259423303413694}
+  - component: {fileID: 946525400021174366}
   m_Layer: 0
   m_Name: ErrorMark
   m_TagString: Untagged
@@ -34,6 +35,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &946525400021174366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2905340452233897796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82cadcabdda3ca54fb5d8c6870702efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3543129984982114026
 GameObject:
   m_ObjectHideFlags: 0
