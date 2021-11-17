@@ -15,26 +15,27 @@ public class ActorMouseOverride : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!TryGetComponent(out actor))
-        {
-            Debug.LogError("Actor script not found.");
-            Destroy(this);
-            return;
-        }
+        if (!TryGetComponentOrDie(out actor) 
+            || !TryGetComponentOrDie(out navMeshAgent) 
+            || !TryGetComponentOrDie(out PlayerInput playerInput)) return;
 
-        if (!TryGetComponent(out navMeshAgent))
-        {
-            Debug.LogError("NavMeshAgent script not found.");
-            Destroy(this);
-            return;
-        }
+        
+        var inputActions = playerInput.actions ? playerInput.actions : throw new NullReferenceException();
+        inputActions.FindAction(PlayerInputAction.ID.MoveCursor, true).performed += OnCursorMove;
+        inputActions.FindAction(PlayerInputAction.ID.RightClick, true).performed += OnRightClickWorld;
+        inputActions.FindAction(PlayerInputAction.ID.MiddleClick, true).performed += OnMiddleClick;
+    }
 
-        var inputActions = GetComponent<PlayerInput>().actions ? GetComponent<PlayerInput>().actions : throw new NullReferenceException();
-        const string moveCursorId = "MoveCursor";
-        const string rightClickId = "OnCursorAltClick0";
-        const string middleClickId = "OnCursorAltClick1";
-        inputActions.FindAction(moveCursorId, true).performed += OnCursorMove;
-        inputActions.FindAction(rightClickId, true).performed += OnRightClickWorld;
+    // TODO: Move to a library
+    // not relevant to class
+    private bool TryGetComponentOrDie<TComponent>(out TComponent component) where TComponent : Component
+    {
+        if (TryGetComponent(out component)) return true;
+
+        Debug.LogError($"{typeof(TComponent).Name} script not found.");
+        Destroy(this);
+
+        return false;
     }
 
     // private void Update() { }
@@ -92,6 +93,11 @@ public class ActorMouseOverride : MonoBehaviour
         }
         
         #endregion Local Functions
+    }
+
+    private void OnMiddleClick(InputAction.CallbackContext _)
+    {
+        // TODO: rotate camera
     }
 
     // TODO: move to a library
