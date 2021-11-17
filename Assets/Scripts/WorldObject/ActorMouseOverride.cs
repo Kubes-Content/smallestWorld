@@ -19,10 +19,19 @@ namespace WorldObject
                 || !TryGetComponentOrDie(out PlayerInput playerInput)) return;
 
         
-            var inputActions = playerInput.actions ? playerInput.actions : throw new NullReferenceException();
-            inputActions.FindAction(PlayerInputAction.ID.MoveCursor, true).performed += OnCursorMove;
-            inputActions.FindAction(PlayerInputAction.ID.RightClick, true).performed += OnRightClickWorld;
-            inputActions.FindAction(PlayerInputAction.ID.MiddleClick, true).performed += OnMiddleClick;
+            bindInputs();
+
+            #region Local Functions
+            
+            void bindInputs()
+            {
+                var inputActions = playerInput.actions ? playerInput.actions : throw new NullReferenceException();
+                inputActions.FindAction(PlayerInputAction.ID.MoveCursor, true).performed += OnCursorMove;
+                inputActions.FindAction(PlayerInputAction.ID.RightClick, true).performed += OnRightClickWorld;
+                inputActions.FindAction(PlayerInputAction.ID.MiddleClick, true).performed += OnMiddleClick;
+            }
+            
+            #endregion Local Functions
         }
 
         // TODO: Move to a library
