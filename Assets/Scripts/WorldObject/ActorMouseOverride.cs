@@ -78,7 +78,7 @@ namespace WorldObject
                 var mouse = Mouse.current;
                 RaycastHit[] results = {default, default};
 
-                var viewportPointToRay = cam.ScreenPointToRay(mouse.position.ReadValue());
+                var viewportPointToRay = cam.ScreenPointToRay(cursorPosition);
                 Debug.DrawRay(viewportPointToRay.origin, viewportPointToRay.direction);
                 var raycastHitCount = Physics.RaycastNonAlloc(viewportPointToRay, results);
                 if (raycastHitCount == 0)
