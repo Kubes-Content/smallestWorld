@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-//[CreateAssetMenu(menuName = "Statics", fileName = "Actor")]
+//[CreateAssetMenu(menuName = "Statics/Actor", fileName = "Actor")]
 namespace WorldObject
 {
     public class ActorStaticVariables : ScriptableObject

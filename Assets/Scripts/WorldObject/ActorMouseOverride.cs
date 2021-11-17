@@ -50,16 +50,16 @@ namespace WorldObject
             var pointReachable = NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, maxDistanceFromNavMesh, NavMesh.AllAreas);
             if (!pointReachable)
             {
-                SpawnClickMarker(target.point);
+                DebugStaticVariables.SpawnModelMissingMarker(target.point);
                 return;
             }
 
-            var initialClickPositionMarker = SpawnClickMarker(target.point);
+            var initialClickPositionMarker = DebugStaticVariables.SpawnModelMissingMarker(target.point);
             initialClickPositionMarker.GetComponent<Recolorable>().Set(Color.yellow);
             initialClickPositionMarker.localScale /= 2;
 
             // relevant position on navMesh
-            SpawnClickMarker(navMeshHit.position)
+            DebugStaticVariables.SpawnModelMissingMarker(navMeshHit.position)
                 .GetComponent<Recolorable>().Set(actor.TryMoveTo(navMeshAgent, navMeshHit.position) ? Color.green : Color.red);
         
             #region Local Functions
@@ -97,16 +97,6 @@ namespace WorldObject
         private void OnMiddleClick(InputAction.CallbackContext _)
         {
             // TODO: rotate camera
-        }
-
-        // TODO: move to a library, DebugStaticVars ScriptableObject?
-        // not relevant to class
-        private static Transform SpawnClickMarker(Vector3 targetPoint)
-        {
-            var markerT = Instantiate(StaticManager.Values.modelMissingPrefab, targetPoint, Quaternion.identity);
-            LimitedLifespan.Limit(markerT.gameObject, 2);
-        
-            return markerT;
         }
     }
 }
