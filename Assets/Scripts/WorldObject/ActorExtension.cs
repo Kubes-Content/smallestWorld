@@ -5,7 +5,7 @@ namespace WorldObject
 {
     public static class ActorExtension
     {
-        public static float GetMinimumMoveDistance(this Actor target) => StaticManager.Values.ActorStaticVars.MinimumMoveDistance;
+        public static float GetMinimumMoveDistance(this Actor target) => ActorStaticVariables.MinimumMoveDistance;
     
         public static bool TryMoveTo(this Actor target, NavMeshAgent navMeshAgent, Vector3 targetPoint)
         {

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: StaticValues
   m_EditorClassIdentifier: 
   actorStaticVars: {fileID: 11400000, guid: fac16423f140e024b9192a380b1165a1, type: 2}
-  modelMissingPrefab: {fileID: 565259423303413694, guid: 7b18397a7a7d4bc44ac79410e53d691a,
-    type: 3}
+  debugStaticVars: {fileID: 11400000, guid: e1a928ddc7175ee4fa650cc2ae298072, type: 2}
+  navMeshStaticVars: {fileID: 11400000, guid: 839912aaa5242094dacf625a29b0b8bf, type: 2}

@@ -46,8 +46,7 @@ namespace WorldObject
             if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
         
-            const float maxDistanceFromNavMesh = 10; // TODO: add to a library, not dependent on this class
-            var pointReachable = NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, maxDistanceFromNavMesh, NavMesh.AllAreas);
+            var pointReachable = NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, NavMeshStaticVariables.MaximumRelevantDistanceFromMesh, NavMesh.AllAreas);
             if (!pointReachable)
             {
                 DebugStaticVariables.SpawnModelMissingMarker(target.point);

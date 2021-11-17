@@ -12,4 +12,8 @@ public class StaticManagerVars : ScriptableObject
     
     [SerializeField, InlineEditor] private DebugStaticVariables debugStaticVars;
     public DebugStaticVariables DebugStaticVars => debugStaticVars;
+
+    [SerializeField, InlineEditor] private NavMeshStaticVariables navMeshStaticVars;
+
+    public NavMeshStaticVariables NavMeshStaticVars => navMeshStaticVars;
 }
