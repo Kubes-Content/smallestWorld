@@ -9,7 +9,9 @@ public class ActorMouseOverride : MonoBehaviour
 {
     private Actor actor;
     private NavMeshAgent navMeshAgent;
-    
+    private Vector2 cursorPosition;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,86 +19,99 @@ public class ActorMouseOverride : MonoBehaviour
         {
             Debug.LogError("Actor script not found.");
             Destroy(this);
+            return;
         }
 
         if (!TryGetComponent(out navMeshAgent))
         {
             Debug.LogError("NavMeshAgent script not found.");
             Destroy(this);
+            return;
         }
+
+        var inputActions = GetComponent<PlayerInput>().actions ? GetComponent<PlayerInput>().actions : throw new NullReferenceException();
+        const string moveCursorId = "MoveCursor";
+        const string rightClickId = "OnCursorAltClick0";
+        const string middleClickId = "OnCursorAltClick1";
+        inputActions.FindAction(moveCursorId, true).performed += OnCursorMove;
+        inputActions.FindAction(rightClickId, true).performed += OnRightClickWorld;
     }
 
-    private void Update()
-    {
-        // switch to binding instead of checking individual controls
-        var mouse = Mouse.current;
-        if (mouse.rightButton.wasReleasedThisFrame) OnRightClickUp();
-        if (mouse.middleButton.isPressed) { /* rotate camera */ }
-    }
+    // private void Update() { }
 
-    private void OnRightClickUp()
+    private void OnCursorMove(InputAction.CallbackContext context) => cursorPosition = context.ReadValue<Vector2>();
+
+    private void OnRightClickWorld(InputAction.CallbackContext _)
     {
-        if (!TryGetClickHit(out RaycastHit target)) return; // nothing hit
+        if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
         
-        const float maxNavMeshDistance = 10; // TODO: add to a library, not dependent on this class
-        if (NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, maxNavMeshDistance, NavMesh.AllAreas))
-        {
-            if (!TryMoveTo(navMeshHit.position)) return; // destination too close too current position
-
-
-            SpawnClickMarker(navMeshHit.position);
-        }
-        else /* target.point not reachable */
+        const float maxDistanceFromNavMesh = 10; // TODO: add to a library, not dependent on this class
+        var pointReachable = NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, maxDistanceFromNavMesh, NavMesh.AllAreas);
+        if (!pointReachable)
         {
             SpawnClickMarker(target.point);
+            return;
         }
-    }
 
-    private bool TryGetClickHit(out RaycastHit target)
-    {
-        var cam = Camera.main; if (!cam) throw new NullReferenceException("Camera.main null.");
-        var mouse = Mouse.current;
-        RaycastHit[] results = {default, default};
+        var initialClickPositionMarker = SpawnClickMarker(target.point);
+        initialClickPositionMarker.GetComponent<Recolorable>().Set(Color.yellow);
+        initialClickPositionMarker.localScale /= 2;
 
-        var viewportPointToRay = cam.ScreenPointToRay(mouse.position.ReadValue());
-        Debug.DrawRay(viewportPointToRay.origin, viewportPointToRay.direction);
-        var raycastHitCount = Physics.RaycastNonAlloc(viewportPointToRay, results);
-        if (raycastHitCount == 0)
+        // relevant position on navMesh
+        SpawnClickMarker(navMeshHit.position)
+            .GetComponent<Recolorable>().Set(TryMoveTo(navMeshHit.position) ? Color.green : Color.red);
+        
+        #region Local Functions
+        
+        bool tryGetClickHit(out RaycastHit targetLocal)
         {
-            target = default;
-            return false;
+            var cam = Camera.main; if (!cam) throw new NullReferenceException("Camera.main null.");
+            var mouse = Mouse.current;
+            RaycastHit[] results = {default, default};
+
+            var viewportPointToRay = cam.ScreenPointToRay(mouse.position.ReadValue());
+            Debug.DrawRay(viewportPointToRay.origin, viewportPointToRay.direction);
+            var raycastHitCount = Physics.RaycastNonAlloc(viewportPointToRay, results);
+            if (raycastHitCount == 0)
+            {
+                targetLocal = default;
+                return false;
+            }
+
+
+            targetLocal = results[0];
+            if (transform.root != targetLocal.transform.root) return true;
+        
+        
+            if (raycastHitCount == 1) return false;
+        
+
+            targetLocal = results[1];
+            return transform.root != targetLocal.transform.root;
         }
-
-
-        target = results[0];
-        if (transform.root != target.transform.root) return true;
         
-        
-        if (raycastHitCount == 1) return false;
-        
-
-        target = results[1];
-        return transform.root != target.transform.root;
+        #endregion Local Functions
     }
 
     // TODO: move to a library
     // not relevant to class
-    private static void SpawnClickMarker(Vector3 targetPoint)
+    private static Transform SpawnClickMarker(Vector3 targetPoint)
     {
-        var markerT = Instantiate(DebugManager.Instance.debugValues.modelMissingPrefab, targetPoint,
-            Quaternion.identity);
+        var markerT = Instantiate(DebugManager.Instance.debugValues.modelMissingPrefab, targetPoint, Quaternion.identity);
         LimitedLifespan.Limit(markerT.gameObject, 2);
+        
+        return markerT;
     }
 
+    // TODO: move to a library
+    // not relevant to class
     private bool TryMoveTo(Vector3 targetPoint)
     {
-        const float minMoveDistance = 1.04f;
-        var distanceFromTarget = Vector3.Distance(targetPoint, transform.position);
-        if (distanceFromTarget <= minMoveDistance) return false;
-
-        Debug.Log($"Distance from target = {distanceFromTarget}");
-
+        const float minMoveDistance = 1.04f; // TODO: move const to a library
+        if (Vector3.Distance(targetPoint, transform.position) <= minMoveDistance) return false;
+        
+        
         navMeshAgent.destination = targetPoint;
         return true;
     }

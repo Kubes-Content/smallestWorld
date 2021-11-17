@@ -11,13 +11,18 @@ public class DebugManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (Instance || !debugValues)
+        if (Instance)
         {
             Debug.LogError("A DebugManager has spawned while one already exists.");
             Destroy(this);
-            return;
+        } else if (!debugValues)
+        {
+            Debug.LogError("A DebugManager has spawned without debug values.");
+            Destroy(this);
         }
-        
-        Instance = this;
+        else
+        {
+            Instance = this;
+        }
     }
 }
