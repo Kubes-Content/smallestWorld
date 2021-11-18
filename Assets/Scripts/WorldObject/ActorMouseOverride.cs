@@ -14,12 +14,12 @@ namespace WorldObject
 
         void Start()
         {
-            if (!TryGetComponentOrDie(out actor) 
-                || !TryGetComponentOrDie(out navMeshAgent) 
-                || !TryGetComponentOrDie(out PlayerInput playerInput)) return;
+            if (!TryGetComponentOrAbort(out actor) 
+                || !TryGetComponentOrAbort(out navMeshAgent) 
+                || !TryGetComponentOrAbort(out PlayerInput playerInput)) return;
 
         
-            bindInputs();
+            bindInputs(); // TODO: unbind on destroy 
 
             #region Local Functions
             
@@ -36,13 +36,13 @@ namespace WorldObject
 
         // TODO: Move to a library
         // not relevant to class
-        private bool TryGetComponentOrDie<TComponent>(out TComponent component) where TComponent : Component
+        private bool TryGetComponentOrAbort<TComponent>(out TComponent component) where TComponent : Component
         {
             if (TryGetComponent(out component)) return true;
 
             Debug.LogError($"{typeof(TComponent).Name} script not found.");
             Destroy(this);
-
+            
             return false;
         }
 
@@ -54,22 +54,10 @@ namespace WorldObject
         {
             if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
-        
-            var pointReachable = NavMesh.SamplePosition(target.point, out NavMeshHit navMeshHit, NavMeshStaticVariables.MaximumRelevantDistanceFromMesh, NavMesh.AllAreas);
-            if (!pointReachable)
-            {
-                DebugStaticVariables.SpawnModelMissingMarker(target.point);
-                return;
-            }
+            // TODO: check if an interactable object was clicked, show its options (string, delegate)
 
-            var initialClickPositionMarker = DebugStaticVariables.SpawnModelMissingMarker(target.point);
-            initialClickPositionMarker.GetComponent<Recolorable>().Set(Color.yellow);
-            initialClickPositionMarker.localScale /= 2;
+            TryMoveActor(target.point);
 
-            // relevant position on navMesh
-            DebugStaticVariables.SpawnModelMissingMarker(navMeshHit.position)
-                .GetComponent<Recolorable>().Set(actor.TryMoveTo(navMeshAgent, navMeshHit.position) ? Color.green : Color.red);
-        
             #region Local Functions
         
             bool tryGetClickHit(out RaycastHit targetLocal)
@@ -100,6 +88,25 @@ namespace WorldObject
             }
         
             #endregion Local Functions
+        }
+
+        private void TryMoveActor(Vector3 targetLocalPoint)
+        {
+            var pointReachable = NavMesh.SamplePosition(targetLocalPoint, out NavMeshHit navMeshHit,
+                NavMeshStaticVariables.MaximumRelevantDistanceFromMesh, NavMesh.AllAreas);
+            if (!pointReachable)
+            {
+                DebugStaticVariables.SpawnModelMissingMarker(targetLocalPoint);
+                return;
+            }
+
+            var initialClickPositionMarker = DebugStaticVariables.SpawnModelMissingMarker(targetLocalPoint);
+            initialClickPositionMarker.GetComponent<Recolorable>().Set(Color.yellow);
+            initialClickPositionMarker.localScale /= 2;
+
+            // relevant position on navMesh
+            DebugStaticVariables.SpawnModelMissingMarker(navMeshHit.position)
+                .GetComponent<Recolorable>().Set(actor.TryMoveTo(navMeshAgent, navMeshHit.position) ? Color.green : Color.red);
         }
 
         private void OnMiddleClick(InputAction.CallbackContext _)
