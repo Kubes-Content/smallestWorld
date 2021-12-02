@@ -9,7 +9,6 @@ namespace WorldObject
     
         public static bool TryMoveTo(this Actor target, NavMeshAgent navMeshAgent, Vector3 targetPoint)
         {
-            Debug.Log($"Distance {Vector3.Distance(targetPoint, navMeshAgent.destination)}");
             if (Vector3.Distance(targetPoint, navMeshAgent.destination) <= target.GetMinimumMoveDistance()) return false;
         
         

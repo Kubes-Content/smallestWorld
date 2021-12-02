@@ -54,8 +54,14 @@ namespace WorldObject
         {
             if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
-            // TODO: check if an interactable object was clicked, show its options (string, delegate)
+            // TODO: check if an interactable object was clicked, show its options
 
+            if (target.transform.root.TryGetComponent(out Interactable interactable))
+            {
+                InteractableUI.Spawn(interactable);
+                return;
+            }
+            
             TryMoveActor(target.point);
 
             #region Local Functions
