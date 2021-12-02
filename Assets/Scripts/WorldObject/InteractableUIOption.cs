@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 
@@ -7,10 +8,11 @@ namespace WorldObject
     {
         [ShowInInspector] private InteractableOption option;
 
-        private InteractableUI ui;
+        [ShowInInspector] private InteractableUI ui;
 
-        // ref to interactable?
-        // ref to interactableUI?
-        // interactableUI can be used to retrieve ref to Interactable?
+        public static InteractableUIOption Spawn(InteractableUI ui, InteractableOption option)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
