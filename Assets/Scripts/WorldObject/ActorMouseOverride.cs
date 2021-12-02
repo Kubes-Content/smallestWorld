@@ -1,15 +1,19 @@
 using System;
+using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 namespace WorldObject
 {
-    public class ActorMouseOverride : MonoBehaviour
+    public class ActorMouseOverride : SerializedMonoBehaviour
     {
         private Actor actor;
         private NavMeshAgent navMeshAgent;
         private Vector2 cursorPosition;
+        [OdinSerialize] private List<(IPlayerInputID, Action<InputAction.CallbackContext>)> actions = new();
 
 
         void Start()
@@ -23,15 +27,23 @@ namespace WorldObject
 
             #region Local Functions
             
-            void bindInputs()
+            void bindInputs() // serialize inputs in editor
             {
                 var inputActions = playerInput.actions ? playerInput.actions : throw new NullReferenceException();
-                inputActions.FindAction(PlayerInputAction.ID.MoveCursor, true).performed += OnCursorMove;
-                inputActions.FindAction(PlayerInputAction.ID.RightClick, true).performed += OnRightClickWorld;
-                inputActions.FindAction(PlayerInputAction.ID.MiddleClick, true).performed += OnMiddleClick;
+                Debug.Assert(actions != null);
+                Debug.Assert(actions.Count != 0);
+
+                foreach (var (idProvider,callback) in actions)
+                {
+                    Debug.Assert(idProvider != null);
+                    Debug.Assert(callback != null);
+
+                    inputActions.FindAction(idProvider.GetID(), true).performed += callback;
+                }
             }
             
             #endregion Local Functions
+            
         }
 
         // TODO: Move to a library
@@ -54,8 +66,20 @@ namespace WorldObject
         {
             if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
-            // TODO: check if an interactable object was clicked, show its options (string, delegate)
+            // TODO: check if an interactable object was clicked, show its options
 
+            if (target.transform.root.TryGetComponent(out Interactable interactable))
+            {
+                // TODO: how are we getting/caching the world canvas?
+                // spawn with this script
+                
+                //InteractableUI.Spawn(interactable, transform, target.point, );
+
+                throw new NotImplementedException();
+                
+                return;
+            }
+            
             TryMoveActor(target.point);
 
             #region Local Functions
