@@ -5,6 +5,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace WorldObject
 {
@@ -61,20 +62,20 @@ namespace WorldObject
         // private void Update() { }
 
         private void OnCursorMove(InputAction.CallbackContext context) => cursorPosition = context.ReadValue<Vector2>();
-
-        private void OnRightClickWorld(InputAction.CallbackContext _)
+        
+        private void OnRightClick(InputAction.CallbackContext _)
         {
             if (!tryGetClickHit(out RaycastHit target)) return; // nothing under mouse hit
 
             // TODO: check if an interactable object was clicked, show its options
-
-            if (target.transform.root.TryGetComponent(out Interactable interactable))
+            if (target.transform.root.TryGetComponent(out Interactable interactable)) 
             {
                 // TODO: how are we getting/caching the world canvas?
-                // spawn with this script
+                // spawn with this script on Start() for now
                 
                 //InteractableUI.Spawn(interactable, transform, target.point, );
 
+                
                 throw new NotImplementedException();
                 
                 return;
